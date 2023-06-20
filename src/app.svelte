@@ -1,3 +1,3 @@
 <main>
-    <h1>win-fe</h1>
+    <h1>Winfex</h1>
 </main>

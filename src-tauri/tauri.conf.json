@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "win-fe",
+    "productName": "winfex",
     "version": "0.0.0"
   },
   "tauri": {
