@@ -1,5 +1,7 @@
 <script lang="ts">
     import type DriveDetails from "src/types/drive-details";
+    import Storage from "./material-icons/storage.svelte";
+    import ProgressBar from "./progress-bar.svelte";
 
     export let driveDetails: DriveDetails;
 
@@ -10,17 +12,34 @@
 
 
 <style>
-    .bold-span {
-        font-weight: bold;
+    .drive {
+        background-color: rgb(18, 18, 18);
+        border-radius: 1em;
+        text-align: center;
+        padding: 1em;
+    }
+
+    header :global(.material-icon) {
+        fill: #fff;
+        width: 1.75rem;
+    }
+
+    header {
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        gap: 0.5em;
     }
 </style>
 
 
 <div class="drive">
-    <h2>Drive { driveDetails.path }</h2>
+    <header>
+        <Storage />
+        <h2>{ driveDetails.path }</h2>
+    </header>
 
-    <p>Available Space: <span class="bold-span">{ bytesToGB(driveDetails.available_space) } GB</span></p>
-    <p>Total Space: <span class="bold-span">{ bytesToGB(driveDetails.total_space) } GB</span></p>
+    <p>{ bytesToGB(driveDetails.available_space) } / { bytesToGB(driveDetails.total_space) } GB</p>
 
-    <progress value={ driveDetails.total_space - driveDetails.available_space } max={ driveDetails.total_space } />
+    <ProgressBar value={ driveDetails.total_space - driveDetails.available_space } maximum={ driveDetails.total_space } />
 </div>
