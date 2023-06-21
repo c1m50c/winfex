@@ -3432,6 +3432,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "windows 0.48.0",
 ]
 
 [[package]]
