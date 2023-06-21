@@ -17,7 +17,6 @@
     }
 
     .progress-indicator {
-        background-color: rgb(47, 121, 105);
         min-height: 1em;
     }
 
@@ -34,5 +33,5 @@
 
 <div class="progress-bar">
     <p class="progress-value">{ valueAsPercentage() }% <span style="font-weight: bold">FULL</span></p>
-    <div class="progress-indicator" style="width: { valueAsPercentage() }%;" />
+    <div class="progress-indicator" style="width: { valueAsPercentage() }%; background-color: color-mix(in srgb, #ff1a1a { valueAsPercentage() }%, #1aff1a);" />
 </div>

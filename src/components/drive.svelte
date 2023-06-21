@@ -14,19 +14,25 @@
 <style>
     .drive {
         background-color: rgb(18, 18, 18);
-        border-radius: 1em;
         text-align: center;
         padding: 1em;
+
+        transition: 300ms ease-in background-color;
+    }
+
+    .drive:hover {
+        background-color: rgb(28, 28, 28);
     }
 
     header :global(.material-icon) {
-        fill: #fff;
         width: 1.75rem;
+        fill: #fff;
     }
 
     header {
         justify-content: center;
         align-items: center;
+        max-height: 1em;
         display: flex;
         gap: 0.5em;
     }
