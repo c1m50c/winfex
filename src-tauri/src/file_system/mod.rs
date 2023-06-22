@@ -1,7 +1,12 @@
+#[cfg(target_os = "windows")]
 use std::os::windows::prelude::MetadataExt;
+
+#[cfg(target_os = "linux")]
+use std::os::linux::fs::MetadataExt;
+
+use std::path::Path;
 use std::fs;
 use std::io;
-use std::path::Path;
 
 use serde::Serialize;
 
@@ -63,7 +68,15 @@ pub fn read_directory(path: String) -> Result<Vec<DirectoryRecord>, Serializable
             .to_string();
 
         let size = entry.metadata()
-            .map(|ok| ok.file_size())
+            .map(|ok| {
+                #[cfg(target_os = "windows")] {
+                    return ok.file_size();
+                }
+
+                #[cfg(target_os = "linux")] {
+                    return ok.st_size();
+                }
+            })
             .ok();
 
         let is_directory = entry.file_type()
