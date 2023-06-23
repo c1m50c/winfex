@@ -1,4 +1,4 @@
-interface DirectoryRecord {
+type DirectoryRecord = {
     is_directory: boolean | undefined,
     size: number | undefined,
     name: string,

@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { type DirectoryData, currentDirectory as currentDirectoryStore } from "../store/directory";
     import QuestionMark from "./material-icons/question-mark.svelte";
     import type DirectoryRecord from "src/types/directory-record";
+    import { readSetDirectory } from "../store/directory";
     import Folder from "./material-icons/folder.svelte";
     import File from "./material-icons/file.svelte";
-    import { invoke } from "@tauri-apps/api/tauri";
 
     export let record: DirectoryRecord;
 
@@ -13,14 +12,7 @@
             return;
         }
 
-        const directoryRecords: Array<DirectoryRecord> = await invoke("read_directory", { path: record.path });
-
-        const directoryData: DirectoryData = {
-            records: directoryRecords,
-            path: record.path,
-        };
-
-        currentDirectoryStore.set(directoryData);
+        readSetDirectory(record.path);
     };
 </script>
 
