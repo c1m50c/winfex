@@ -1,30 +1,91 @@
-use sysinfo::{System, SystemExt, DiskExt};
+#[cfg(target_os = "windows")]
+use std::os::windows::prelude::MetadataExt;
+
+#[cfg(target_os = "linux")]
+use std::os::linux::fs::MetadataExt;
+
+use std::path::Path;
+use std::fs;
+use std::io;
+
 use serde::Serialize;
+
+pub mod drive;
 
 
 #[derive(Debug, Serialize)]
-pub struct DriveDetails {
-    available_space: u64,
-    total_space: u64,
+pub struct DirectoryRecord {
+    name: String,
     path: String,
+
+    #[serde(skip_serializing_if  = "Option::is_none")]
+    size: Option<u64>,
+
+    #[serde(skip_serializing_if  = "Option::is_none")]
+    is_directory: Option<bool>,
+}
+
+
+#[derive(Debug)]
+pub struct SerializableIoError(io::Error);
+
+
+impl From<io::Error> for SerializableIoError {
+    fn from(value: io::Error) -> Self {
+        Self(value)
+    }
+}
+
+
+impl Serialize for SerializableIoError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer
+    {
+        serializer.serialize_str(&self.0.to_string())
+    }
 }
 
 
 #[tauri::command]
-pub fn get_drive_details() -> Vec<DriveDetails> {
-    let mut system = System::new_all();
-    system.refresh_all();
+pub fn read_directory(path: String) -> Result<Vec<DirectoryRecord>, SerializableIoError> {
+    let mut records = Vec::new();
+    let path = Path::new(&path);
 
-    let drive_details = system.disks().into_iter()
-        .map(|disk| {
-            DriveDetails {
-                available_space: disk.available_space(),
-                total_space: disk.total_space(),
-                path: disk.mount_point().to_str()
-                    .unwrap_or_default()
-                    .to_string(),
-            }
-        });
+    if path.is_file() {
+        return Ok(records);
+    }
 
-    drive_details.collect()
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+
+        let name = entry.file_name().to_str()
+            .unwrap_or_default()
+            .to_string();
+
+        let path = entry.path().to_str()
+            .unwrap_or_default()
+            .to_string();
+
+        let size = entry.metadata()
+            .map(|ok| {
+                #[cfg(target_os = "windows")] {
+                    return ok.file_size();
+                }
+
+                #[cfg(target_os = "linux")] {
+                    return ok.st_size();
+                }
+            })
+            .ok();
+
+        let is_directory = entry.file_type()
+            .map(|ok| ok.is_dir())
+            .ok();
+
+        let record = DirectoryRecord { name, path, size, is_directory };
+        records.push(record);
+    }
+
+    Ok(records)
 }

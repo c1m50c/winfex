@@ -1,7 +1,10 @@
 <script lang="ts">
+    import type DirectoryRecord from "src/types/directory-record";
     import type DriveDetails from "src/types/drive-details";
     import Storage from "./material-icons/storage.svelte";
+    import { readSetDirectory } from "../store/directory";
     import ProgressBar from "./progress-bar.svelte";
+    import { invoke } from "@tauri-apps/api/tauri";
 
     export let driveDetails: DriveDetails;
 
@@ -14,26 +17,32 @@
 <style>
     .drive {
         background-color: rgb(18, 18, 18);
-        border-radius: 1em;
         text-align: center;
         padding: 1em;
+
+        transition: 300ms ease-in background-color;
+    }
+
+    .drive:hover {
+        background-color: rgb(28, 28, 28);
     }
 
     header :global(.material-icon) {
-        fill: #fff;
         width: 1.75rem;
+        fill: #fff;
     }
 
     header {
         justify-content: center;
         align-items: center;
+        max-height: 1em;
         display: flex;
         gap: 0.5em;
     }
 </style>
 
 
-<div class="drive">
+<div class="drive" on:dblclick={ readSetDirectory(driveDetails.path) }>
     <header>
         <Storage />
         <h2>{ driveDetails.path }</h2>
